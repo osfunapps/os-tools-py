@@ -7,6 +7,7 @@
 import os
 import shutil
 
+
 # will return the content of a directory (full paths)
 def get_dir_content(dir_path, ignored_files_arr=['.DS_Store']):
     f = []
@@ -56,7 +57,13 @@ def copy_dir(src, dst):
 
 # will copy a file to a dest
 def copy_file(src, dst):
-    shutil.copyfile(src, dst)
+    shutil.copy(src, dst)
+
+
+# will copy a list of files to a dir
+def copy_list_of_files(files_list, dst):
+    for file in files_list:
+        copy_file(file, dst)
 
 
 # will search for a file in a path
@@ -83,3 +90,40 @@ def replace_line_in_line(file, line_in_line_dict):
 
     with open(file, "w") as f:
         f.writelines(lines)
+
+
+# is write permission granted
+def is_file_write_permission_granted(file_path):
+    return os.access(file_path, os.W_OK)
+
+
+# is read permission granted
+def is_file_read_permission_granted(file_path):
+    return os.access(file_path, os.R_OK)
+
+
+# is file exists
+def is_file_exists(file_path):
+    return os.path.exists(file_path)
+
+
+# is directory exists
+def is_dir_exists(dir_path):
+    return os.path.isdir(dir_path)
+
+
+# will copy the content of a directory to another directory
+def copy_dir_content(dir_src, dir_dest):
+    from distutils.dir_util import copy_tree
+    copy_tree(dir_src, dir_dest)
+
+
+# will clear the content of a directory
+def clear_dir_content(dir_path):
+    shutil.rmtree(dir_path)
+    create_dir(dir_path)
+
+
+# will create a directory
+def create_dir(dir_path):
+    os.makedirs(dir_path)

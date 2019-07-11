@@ -8,3 +8,4 @@
 # will print an array
 def print_arr(arr, divider='\n'):
     print(divider.join(arr))
+
