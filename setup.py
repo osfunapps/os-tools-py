@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = 'os_tools',         # How you named your package folder (MyLib)
     packages = ['os_tools'],   # Choose the same as "name"
-    version = '2.37',      # Start with a small number and increase it with every change you make
+    version = '1.0',      # Start with a small number and increase it with every change you make
     license='MIT',        # Chose a license from here: https://help.github.com/articles/licensing-a-repository
     description = 'py tools for os',   # Give a short description about your library
     author = 'Oz Shabat',                   # Type in your name
