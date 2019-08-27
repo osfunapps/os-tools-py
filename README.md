@@ -90,7 +90,7 @@ Require FileHandler or LoggerHandler or Tools or XmlFileHanlder:
     
     
     # will replace a text in a line in a file with other line
-    def replace_line_in_line(file, line_in_line_dict):
+    def replace_line_for_line(file, line_in_line_dict):
         lines = []
         with open(file, "r") as f:
             for line in f:
