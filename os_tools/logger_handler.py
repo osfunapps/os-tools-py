@@ -21,7 +21,7 @@ class Logger:
             raise Exception('ERROR: you must set instance or name for logging!')
         if __file__ is not None:
             import os.path
-            import os_tools.FileHandler as fh
+            import os_tools.file_handler as fh
             name = os.path.dirname(os.path.abspath(__file__))
             name = fh.get_file_name_from_path(name)
         logging.basicConfig(level=logging.INFO)

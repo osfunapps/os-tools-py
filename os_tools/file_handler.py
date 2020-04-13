@@ -9,20 +9,38 @@ import shutil
 
 
 # will return the content of a directory (full paths)
-def get_dir_content(dir_path, ignored_files_arr=['.DS_Store']):
-    f = []
+def get_dir_content(dir_path, recursive=False, collect_dirs=True, collect_files=True, ignored_files_arr=['.DS_Store']):
+    f_list = []
+    d_list = []
     for path, dirs, files in os.walk(dir_path):
-        for filename in files:
-            f.append(os.path.join(path, filename))
-            break
+        if collect_dirs:
+            if not recursive:
+                d_list = append_path_to_list(path, dirs)
+                if collect_files:
+                    f_list = append_path_to_list(path, files)
+                break
+            d_list += append_path_to_list(path, dirs)
+        if collect_files:
+            if not recursive:
+                f_list = append_path_to_list(path, files)
+                break
 
-    f = list(filter(lambda x: get_file_name_from_path(x) not in ignored_files_arr, f))
-    return f
+            f_list += append_path_to_list(path, files)
 
-# will return the dirs of a directory (full paths)
-def get_dirs_from_dir(dir_path):
-    for path, dirs, files in os.walk(dir_path):
-        return dirs
+    f_list = list(filter(lambda x: get_file_name_from_path(x) not in ignored_files_arr, f_list))
+    if f_list:
+        if d_list:
+            return [d_list, f_list]
+        return f_list
+    return d_list
+
+
+# will append a base path to every file in a file list
+def append_path_to_list(base_path, file_list):
+    full_path_file_list = []
+    for file in file_list:
+        full_path_file_list.append(os.path.join(base_path, file))
+    return full_path_file_list
 
 
 # will return the name of the last dir name from a path
@@ -36,6 +54,13 @@ def split_path(path):
     return path.split(os.sep)
 
 
+# will create a file
+def create_file(path, content: list=None):
+    with open(path, 'w') as f:
+        if content:
+            f.writelines(content)
+
+
 # will return the extension of a file from a file path
 def get_extension_from_file(file):
     _, file_extension = os.path.splitext(file)
@@ -43,21 +68,32 @@ def get_extension_from_file(file):
 
 
 # will return the file name from a file path
-def get_file_name_from_path(file):
+def get_file_name_from_path(file, with_extension=True):
     import ntpath
-    return ntpath.basename(file)
+    filename = ntpath.basename(file)
+    if not with_extension:
+        last_dot_idx = filename.rfind('.')
+        filename = filename[:last_dot_idx]
+    return filename
 
 
 # will remove a directory
 def remove_dir(path):
-    if (os.path.isdir(path)):
+    if os.path.isdir(path):
         shutil.rmtree(path)
 
 
+# will remove a bunch of files in a list
+def remove_files(file_list):
+    for file in file_list:
+        remove_file(file)
+
+
 # will copy a directory
-def copy_dir(src, dst):
-    from distutils.dir_util import copy_tree
-    copy_tree(src, dst)
+def copy_dir(src, dst, ignore_patterns_str='.DS_Store'):
+    from shutil import copytree, ignore_patterns
+
+    copytree(src, dst, ignore=ignore_patterns(ignore_patterns_str))
 
 
 # will copy a file to a dest
@@ -87,12 +123,29 @@ def copy_list_of_files(files_list, dst):
         copy_file(file, dst)
 
 
-# will search for a file in a path
-def search_file(path_to_search, file_name):
+# will search for a file in a path by prefix, suffix, full name with/without an extension
+def search_files(path_to_search, full_name=None, prefix=None, suffix=None, by_extension=None):
     from pathlib import Path
     files = []
-    for filename in Path(path_to_search).glob('**/' + file_name):
-        files.append(filename)
+    search_queue = '**/'
+    if full_name:
+        search_queue += full_name
+        if by_extension:
+            search_queue += by_extension
+    else:
+        if prefix:
+            search_queue += f'{prefix}*'
+            if by_extension:
+                search_queue += by_extension
+        elif suffix:
+            search_queue += f'*{suffix}'
+            if by_extension:
+                search_queue += by_extension
+        else:
+            search_queue += f'*{by_extension}'
+
+    for filename in Path(path_to_search).glob(search_queue):
+        files.append(str(filename))
     return files
 
 
@@ -140,6 +193,10 @@ def is_dir_exists(dir_path):
     return os.path.isdir(dir_path)
 
 
+def is_dir_empty(dir_path):
+    return len(os.listdir(dir_path)) == 0
+
+
 # will copy the content of a directory to another directory
 def copy_dir_content(dir_src, dir_dest):
     from distutils.dir_util import copy_tree
@@ -164,7 +221,12 @@ def remove_all_files_with_extension(path, ext):
     if ext[0] == '.':
         ext = ext[1:]
     for f in glob.glob(path + "/*." + ext):
-        os.remove(f)
+        remove_file(f)
+
+
+# will remove a single file
+def remove_file(file):
+    os.remove(file)
 
 
 # will check if line exists in a file
@@ -193,6 +255,13 @@ def json_file_to_dict(json_file):
     with open(json_file) as f:
         data = json.load(f)
     return data
+
+
+# will turn a dictionary to a json file
+def dict_to_json_file(json_file, dictt):
+    import json
+    with open(json_file, 'w') as f:
+        json.dump(dictt, f)
 
 
 def remove_lines_from_file(file_path, lines_arr_to_remove=None, remove_from=None, remove_until=None):

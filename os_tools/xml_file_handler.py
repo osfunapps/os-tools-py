@@ -1,4 +1,4 @@
-import os_tools.FileHandler as fh
+import os_tools.file_handler as fh
 
 
 ###########################################################################
@@ -128,3 +128,9 @@ def simple_dict_to_xml(xml_dict, root_name, output_path):
     xml = create_xml_file(root_name, output_path)
     recursive_unpack_parent(xml_dict)
     save_xml_file(xml, output_path)
+
+
+def get_root_node(xml_file):
+    return xml_file.getroot()
+
+

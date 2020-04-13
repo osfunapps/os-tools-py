@@ -12,10 +12,10 @@ Install via pip:
 ## Usage       
 Require FileHandler or LoggerHandler or Tools or XmlFileHanlder:
         
-    import ostools.LoggerHandler as lh
-    import ostools.FileHandler as fh
-    import ostools.XmlFileHandler as xh
-    import ostools.Tools as tools
+    import ostools.logger_handler as lh
+    import ostools.file_handler as fh
+    import ostools.xml_file_handler as xh
+    import ostools.tools as tools
     
 
 ## Functions and signatures:
